@@ -1015,7 +1015,7 @@ class NativeAd extends AdWithView {
     this.nativeTemplateStyle,
   })  : adManagerRequest = null,
         assert(request != null),
-        assert(nativeTemplateStyle != null || factoryId != null),
+        // assert(nativeTemplateStyle != null || factoryId != null),
         super(adUnitId: adUnitId, listener: listener);
 
   /// Creates a [NativeAd] with Ad Manager.
@@ -1068,6 +1068,25 @@ class NativeAd extends AdWithView {
   @override
   Future<void> load() async {
     await instanceManager.loadNativeAd(this);
+  }
+
+  /// [New] added by Bill
+  /// It's not necessary to bind styles
+  /// If there is not binding style. setFactoryId or setTemplateStyle must be called before the ad is show
+  Future<void> preLoad() async {
+    await instanceManager.preLoadNativeAd(this);
+  }
+
+  /// [New] added by Bill
+  /// set factory id.
+  Future<void> setFactoryId(String factoryId) async {
+    return instanceManager.setNativeAdFactoryId(this, factoryId);
+  }
+
+  /// [New] added by Bill
+  /// set template style
+  Future<void> setTemplateStyle(NativeTemplateStyle nativeTemplateStyle) async {
+    return instanceManager.setNativeAdTemplateStyle(this, nativeTemplateStyle);
   }
 }
 

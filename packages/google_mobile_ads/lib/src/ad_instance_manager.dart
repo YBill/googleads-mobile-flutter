@@ -533,6 +533,48 @@ class AdInstanceManager {
     );
   }
 
+  /// [New] added by Bill
+  /// It's not necessary to bind styles
+  Future<void> preLoadNativeAd(NativeAd ad) {
+    if (adIdFor(ad) != null) {
+      return Future<void>.value();
+    }
+
+    final int adId = _nextAdId++;
+    _loadedAds[adId] = ad;
+    return channel.invokeMethod<void>(
+      'preLoadNativeAd',
+      <dynamic, dynamic>{
+        'adId': adId,
+        'adUnitId': ad.adUnitId,
+        'request': ad.request,
+        'adManagerRequest': ad.adManagerRequest,
+        'factoryId': ad.factoryId,
+        'nativeAdOptions': ad.nativeAdOptions,
+        'customOptions': ad.customOptions,
+        'nativeTemplateStyle': ad.nativeTemplateStyle,
+      },
+    );
+  }
+
+  /// [New] added by Bill
+  /// set factory id.
+  Future<void> setNativeAdFactoryId(NativeAd ad, String factoryId) async {
+    return channel.invokeMethod<void>('setNativeAdFactoryId', <dynamic, dynamic>{
+      'adId': adIdFor(ad),
+      'factoryId': factoryId,
+    });
+  }
+
+  /// [New] added by Bill
+  /// set template style
+  Future<void> setNativeAdTemplateStyle(NativeAd ad, NativeTemplateStyle nativeTemplateStyle) async {
+    return channel.invokeMethod<void>('setNativeAdTemplateStyle', <dynamic, dynamic>{
+      'adId': adIdFor(ad),
+      'nativeTemplateStyle': nativeTemplateStyle,
+    });
+  }
+
   /// Starts loading the ad if not previously loaded.
   ///
   /// Loading also terminates if ad is already in the process of loading.
