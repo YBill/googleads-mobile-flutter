@@ -435,6 +435,42 @@ public class GoogleMobileAdsPlugin implements FlutterPlugin, ActivityAware, Meth
         nativeAd.load();
         result.success(null);
         break;
+      case "preLoadNativeAd":
+        final NativeAdFactory preLoadNativeAdFactory = nativeAdFactories.get(call.<String>argument("factoryId"));
+        final FlutterNativeTemplateStyle preLoadNativeAdTemplateStyle = call.argument("nativeTemplateStyle");
+        if (preLoadNativeAdFactory == null && preLoadNativeAdTemplateStyle == null) {
+          Log.i(TAG, "preLoad NativeAd, No binding style");
+        }
+
+        final FlutterNativeAd preLoadNativeAd =
+                new FlutterNativeAd.Builder(context)
+                        .setManager(instanceManager)
+                        .setAdUnitId(call.<String>argument("adUnitId"))
+                        .setAdFactory(preLoadNativeAdFactory)
+                        .setRequest(call.<FlutterAdRequest>argument("request"))
+                        .setAdManagerRequest(call.<FlutterAdManagerAdRequest>argument("adManagerRequest"))
+                        .setCustomOptions(call.<Map<String, Object>>argument("customOptions"))
+                        .setId(call.<Integer>argument("adId"))
+                        .setNativeAdOptions(call.<FlutterNativeAdOptions>argument("nativeAdOptions"))
+                        .setFlutterAdLoader(new FlutterAdLoader(context))
+                        .setNativeTemplateStyle(preLoadNativeAdTemplateStyle)
+                        .build();
+        instanceManager.trackAd(preLoadNativeAd, call.<Integer>argument("adId"));
+        preLoadNativeAd.load();
+        result.success(null);
+        break;
+      case "setNativeAdFactoryId":
+        final NativeAdFactory setNativeAdFIFactory = nativeAdFactories.get(call.<String>argument("factoryId"));
+        FlutterNativeAd setNativeAdFINativeAd = (FlutterNativeAd) instanceManager.adForId(call.<Integer>argument("adId"));
+        setNativeAdFINativeAd.setAdFactory(setNativeAdFIFactory);
+        result.success(null);
+        break;
+      case "setNativeAdTemplateStyle":
+        final FlutterNativeTemplateStyle setNativeAdTSTemplateStyle = call.<FlutterNativeTemplateStyle>argument("nativeTemplateStyle");
+        FlutterNativeAd setNativeAdTSNativeAd = (FlutterNativeAd) instanceManager.adForId(call.<Integer>argument("adId"));
+        setNativeAdTSNativeAd.setNativeTemplateStyle(setNativeAdTSTemplateStyle);
+        result.success(null);
+        break;
       case "loadInterstitialAd":
         final FlutterInterstitialAd interstitial =
             new FlutterInterstitialAd(

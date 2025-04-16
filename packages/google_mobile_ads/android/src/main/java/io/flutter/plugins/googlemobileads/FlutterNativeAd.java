@@ -37,16 +37,18 @@ class FlutterNativeAd extends FlutterAd {
 
   @NonNull private final AdInstanceManager manager;
   @NonNull private final String adUnitId;
-  @Nullable private final NativeAdFactory adFactory;
+  @Nullable private NativeAdFactory adFactory;
   @NonNull private final FlutterAdLoader flutterAdLoader;
   @Nullable private FlutterAdRequest request;
   @Nullable private FlutterAdManagerAdRequest adManagerRequest;
   @Nullable private Map<String, Object> customOptions;
   @Nullable private NativeAdView nativeAdView;
   @Nullable private final FlutterNativeAdOptions nativeAdOptions;
-  @Nullable private final FlutterNativeTemplateStyle nativeTemplateStyle;
+  @Nullable private FlutterNativeTemplateStyle nativeTemplateStyle;
   @Nullable private TemplateView templateView;
   @NonNull private final Context context;
+
+  private NativeAd nativeAd;
 
   static class Builder {
     @Nullable private AdInstanceManager manager;
@@ -66,7 +68,7 @@ class FlutterNativeAd extends FlutterAd {
     }
 
     @CanIgnoreReturnValue
-    public Builder setAdFactory(@NonNull NativeAdFactory adFactory) {
+    public Builder setAdFactory(@Nullable NativeAdFactory adFactory) {
       this.adFactory = adFactory;
       return this;
     }
@@ -131,9 +133,9 @@ class FlutterNativeAd extends FlutterAd {
         throw new IllegalStateException("AdInstanceManager cannot be null.");
       } else if (adUnitId == null) {
         throw new IllegalStateException("AdUnitId cannot be null.");
-      } else if (adFactory == null && nativeTemplateStyle == null) {
+      } /*else if (adFactory == null && nativeTemplateStyle == null) {
         throw new IllegalStateException("NativeAdFactory and nativeTemplateStyle cannot be null.");
-      } else if (request == null && adManagerRequest == null) {
+      }*/ else if (request == null && adManagerRequest == null) {
         throw new IllegalStateException("adRequest or addManagerRequest must be non-null.");
       }
 
@@ -174,7 +176,7 @@ class FlutterNativeAd extends FlutterAd {
       int adId,
       @NonNull AdInstanceManager manager,
       @NonNull String adUnitId,
-      @NonNull NativeAdFactory adFactory,
+      @Nullable NativeAdFactory adFactory,
       @NonNull FlutterAdRequest request,
       @NonNull FlutterAdLoader flutterAdLoader,
       @Nullable Map<String, Object> customOptions,
@@ -197,7 +199,7 @@ class FlutterNativeAd extends FlutterAd {
       int adId,
       @NonNull AdInstanceManager manager,
       @NonNull String adUnitId,
-      @NonNull NativeAdFactory adFactory,
+      @Nullable NativeAdFactory adFactory,
       @NonNull FlutterAdManagerAdRequest adManagerRequest,
       @NonNull FlutterAdLoader flutterAdLoader,
       @Nullable Map<String, Object> customOptions,
@@ -249,14 +251,34 @@ class FlutterNativeAd extends FlutterAd {
   }
 
   void onNativeAdLoaded(@NonNull NativeAd nativeAd) {
-    if (nativeTemplateStyle != null) {
-      templateView = nativeTemplateStyle.asTemplateView(context);
-      templateView.setNativeAd(nativeAd);
+    if (adFactory == null && nativeTemplateStyle == null) {
+      this.nativeAd = nativeAd;
     } else {
-      nativeAdView = adFactory.createNativeAd(nativeAd, customOptions);
+      if (nativeTemplateStyle != null) {
+        templateView = nativeTemplateStyle.asTemplateView(context);
+        templateView.setNativeAd(nativeAd);
+      } else {
+        nativeAdView = adFactory.createNativeAd(nativeAd, customOptions);
+      }
     }
+
     nativeAd.setOnPaidEventListener(new FlutterPaidEventListener(manager, this));
     manager.onAdLoaded(adId, nativeAd.getResponseInfo());
+  }
+
+  void setAdFactory(@NonNull NativeAdFactory adFactory) {
+    if (nativeAdView != null) {
+      return;
+    }
+    nativeAdView = adFactory.createNativeAd(nativeAd, customOptions);
+  }
+
+  void setNativeTemplateStyle(@NonNull FlutterNativeTemplateStyle nativeTemplateStyle) {
+    if (templateView != null) {
+      return;
+    }
+    templateView = nativeTemplateStyle.asTemplateView(context);
+    templateView.setNativeAd(nativeAd);
   }
 
   @Override
