@@ -29,12 +29,12 @@ _nativeAd = NativeAd(
     )..preLoad();
 ```
 
-2、If you use preLoad() to load ads without passing factoryId and templateStyle, you must call the factoryId() or templateStyle() methods before displaying ads.
+2、If you use preLoad() to load ads without passing factoryId and templateStyle, you must call the bindViewByFactoryId() or bindViewByTemplateStyle() methods before displaying ads.
 
 ```flutter
-await _nativeAd.setFactoryId("");
+await _nativeAd.bindViewByFactoryId("");
 // or
-await _nativeAd.setTemplateStyle(NativeTemplateStyle());
+await _nativeAd.bindViewByTemplateStyle(NativeTemplateStyle());
 ```
 
 before use

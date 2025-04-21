@@ -21,14 +21,14 @@
     }
     
     /// [New] added by Bill
-    /// set factory id.
-    Future<void> setFactoryId(String factoryId) async {
+    /// bind view buy factoryId.
+    Future<void> bindViewByFactoryId(String factoryId) async {
       return instanceManager.setNativeAdFactoryId(this, factoryId);
     }
     
     /// [New] added by Bill
-    /// set template style
-    Future<void> setTemplateStyle(NativeTemplateStyle nativeTemplateStyle) async {
+    /// bind view buy templateStyle.
+    Future<void> bindViewByTemplateStyle(NativeTemplateStyle nativeTemplateStyle) async {
       return instanceManager.setNativeAdTemplateStyle(this, nativeTemplateStyle);
     }
 ```
@@ -59,24 +59,24 @@
         },
       );
     }
-    
+
     /// [New] added by Bill
-    /// set factory id.
+    /// bind view buy factoryId.
     Future<void> setNativeAdFactoryId(NativeAd ad, String factoryId) async {
-      return channel.invokeMethod<void>('setNativeAdFactoryId', <dynamic, dynamic>{
+      return channel.invokeMethod<void>('bindNativeAdViewByFactoryId', <dynamic, dynamic>{
         'adId': adIdFor(ad),
         'factoryId': factoryId,
       });
     }
-    
+
     /// [New] added by Bill
-    /// set template style
+    /// bind view buy templateStyle.
     Future<void> setNativeAdTemplateStyle(NativeAd ad, NativeTemplateStyle nativeTemplateStyle) async {
-      return channel.invokeMethod<void>('setNativeAdTemplateStyle', <dynamic, dynamic>{
+      return channel.invokeMethod<void>('bindNativeAdViewByTemplateStyle', <dynamic, dynamic>{
         'adId': adIdFor(ad),
         'nativeTemplateStyle': nativeTemplateStyle,
       });
-    }  
+    }
 ```
 
 ##### 2、Android：
@@ -87,39 +87,39 @@
 public void onMethodCall(@NonNull MethodCall call, @NonNull final Result result) {
     switch (call.method) {
         case "preLoadNativeAd":
-            final NativeAdFactory preLoadNativeAdFactory = nativeAdFactories.get(call.<String>argument("factoryId"));
-            final FlutterNativeTemplateStyle preLoadNativeAdTemplateStyle = call.argument("nativeTemplateStyle");
-            if (preLoadNativeAdFactory == null && preLoadNativeAdTemplateStyle == null) {
+            final NativeAdFactory factory2 = nativeAdFactories.get(call.<String>argument("factoryId"));
+            final FlutterNativeTemplateStyle templateStyle2 = call.argument("nativeTemplateStyle");
+            if (factory2 == null && templateStyle2 == null) {
                 Log.i(TAG, "preLoad NativeAd, No binding style");
             }
 
-            final FlutterNativeAd preLoadNativeAd =
+            final FlutterNativeAd nativeAd2 =
                     new FlutterNativeAd.Builder(context)
                             .setManager(instanceManager)
                             .setAdUnitId(call.<String>argument("adUnitId"))
-                            .setAdFactory(preLoadNativeAdFactory)
+                            .setAdFactory(factory2)
                             .setRequest(call.<FlutterAdRequest>argument("request"))
                             .setAdManagerRequest(call.<FlutterAdManagerAdRequest>argument("adManagerRequest"))
                             .setCustomOptions(call.<Map<String, Object>>argument("customOptions"))
                             .setId(call.<Integer>argument("adId"))
                             .setNativeAdOptions(call.<FlutterNativeAdOptions>argument("nativeAdOptions"))
                             .setFlutterAdLoader(new FlutterAdLoader(context))
-                            .setNativeTemplateStyle(preLoadNativeAdTemplateStyle)
+                            .setNativeTemplateStyle(templateStyle2)
                             .build();
-            instanceManager.trackAd(preLoadNativeAd, call.<Integer>argument("adId"));
-            preLoadNativeAd.load();
+            instanceManager.trackAd(nativeAd2, call.<Integer>argument("adId"));
+            nativeAd2.load();
             result.success(null);
             break;
-        case "setNativeAdFactoryId":
-            final NativeAdFactory setNativeAdFIFactory = nativeAdFactories.get(call.<String>argument("factoryId"));
-            FlutterNativeAd setNativeAdFINativeAd = (FlutterNativeAd) instanceManager.adForId(call.<Integer>argument("adId"));
-            setNativeAdFINativeAd.setAdFactory(setNativeAdFIFactory);
+        case "bindNativeAdViewByFactoryId":
+            final NativeAdFactory factory3 = nativeAdFactories.get(call.<String>argument("factoryId"));
+            FlutterNativeAd nativeAd3 = (FlutterNativeAd) instanceManager.adForId(call.<Integer>argument("adId"));
+            nativeAd3.createNativeAdView(factory3);
             result.success(null);
             break;
-        case "setNativeAdTemplateStyle":
-            final FlutterNativeTemplateStyle setNativeAdTSTemplateStyle = call.<FlutterNativeTemplateStyle>argument("nativeTemplateStyle");
-            FlutterNativeAd setNativeAdTSNativeAd = (FlutterNativeAd) instanceManager.adForId(call.<Integer>argument("adId"));
-            setNativeAdTSNativeAd.setNativeTemplateStyle(setNativeAdTSTemplateStyle);
+        case "bindNativeAdViewByTemplateStyle":
+            final FlutterNativeTemplateStyle templateStyle3 = call.<FlutterNativeTemplateStyle>argument("nativeTemplateStyle");
+            FlutterNativeAd nativeAd4 = (FlutterNativeAd) instanceManager.adForId(call.<Integer>argument("adId"));
+            nativeAd4.createTemplateView(templateStyle3);
             result.success(null);
             break;
     }
@@ -146,14 +146,14 @@ public void onMethodCall(@NonNull MethodCall call, @NonNull final Result result)
         manager.onAdLoaded(adId, nativeAd.getResponseInfo());
     }
 
-    void setAdFactory(@NonNull NativeAdFactory adFactory) {
+    void createNativeAdView(@NonNull NativeAdFactory adFactory) {
         if (nativeAdView != null) {
             return;
         }
         nativeAdView = adFactory.createNativeAd(nativeAd, customOptions);
     }
     
-    void setNativeTemplateStyle(@NonNull FlutterNativeTemplateStyle nativeTemplateStyle) {
+    void createTemplateView(@NonNull FlutterNativeTemplateStyle nativeTemplateStyle) {
         if (templateView != null) {
             return;
         }

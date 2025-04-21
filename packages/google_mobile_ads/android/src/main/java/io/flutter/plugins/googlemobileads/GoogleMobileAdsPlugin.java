@@ -436,39 +436,39 @@ public class GoogleMobileAdsPlugin implements FlutterPlugin, ActivityAware, Meth
         result.success(null);
         break;
       case "preLoadNativeAd":
-        final NativeAdFactory preLoadNativeAdFactory = nativeAdFactories.get(call.<String>argument("factoryId"));
-        final FlutterNativeTemplateStyle preLoadNativeAdTemplateStyle = call.argument("nativeTemplateStyle");
-        if (preLoadNativeAdFactory == null && preLoadNativeAdTemplateStyle == null) {
+        final NativeAdFactory factory2 = nativeAdFactories.get(call.<String>argument("factoryId"));
+        final FlutterNativeTemplateStyle templateStyle2 = call.argument("nativeTemplateStyle");
+        if (factory2 == null && templateStyle2 == null) {
           Log.i(TAG, "preLoad NativeAd, No binding style");
         }
 
-        final FlutterNativeAd preLoadNativeAd =
+        final FlutterNativeAd nativeAd2 =
                 new FlutterNativeAd.Builder(context)
                         .setManager(instanceManager)
                         .setAdUnitId(call.<String>argument("adUnitId"))
-                        .setAdFactory(preLoadNativeAdFactory)
+                        .setAdFactory(factory2)
                         .setRequest(call.<FlutterAdRequest>argument("request"))
                         .setAdManagerRequest(call.<FlutterAdManagerAdRequest>argument("adManagerRequest"))
                         .setCustomOptions(call.<Map<String, Object>>argument("customOptions"))
                         .setId(call.<Integer>argument("adId"))
                         .setNativeAdOptions(call.<FlutterNativeAdOptions>argument("nativeAdOptions"))
                         .setFlutterAdLoader(new FlutterAdLoader(context))
-                        .setNativeTemplateStyle(preLoadNativeAdTemplateStyle)
+                        .setNativeTemplateStyle(templateStyle2)
                         .build();
-        instanceManager.trackAd(preLoadNativeAd, call.<Integer>argument("adId"));
-        preLoadNativeAd.load();
+        instanceManager.trackAd(nativeAd2, call.<Integer>argument("adId"));
+        nativeAd2.load();
         result.success(null);
         break;
-      case "setNativeAdFactoryId":
-        final NativeAdFactory setNativeAdFIFactory = nativeAdFactories.get(call.<String>argument("factoryId"));
-        FlutterNativeAd setNativeAdFINativeAd = (FlutterNativeAd) instanceManager.adForId(call.<Integer>argument("adId"));
-        setNativeAdFINativeAd.setAdFactory(setNativeAdFIFactory);
+      case "bindNativeAdViewByFactoryId":
+        final NativeAdFactory factory3 = nativeAdFactories.get(call.<String>argument("factoryId"));
+        FlutterNativeAd nativeAd3 = (FlutterNativeAd) instanceManager.adForId(call.<Integer>argument("adId"));
+        nativeAd3.createNativeAdView(factory3);
         result.success(null);
         break;
-      case "setNativeAdTemplateStyle":
-        final FlutterNativeTemplateStyle setNativeAdTSTemplateStyle = call.<FlutterNativeTemplateStyle>argument("nativeTemplateStyle");
-        FlutterNativeAd setNativeAdTSNativeAd = (FlutterNativeAd) instanceManager.adForId(call.<Integer>argument("adId"));
-        setNativeAdTSNativeAd.setNativeTemplateStyle(setNativeAdTSTemplateStyle);
+      case "bindNativeAdViewByTemplateStyle":
+        final FlutterNativeTemplateStyle templateStyle3 = call.<FlutterNativeTemplateStyle>argument("nativeTemplateStyle");
+        FlutterNativeAd nativeAd4 = (FlutterNativeAd) instanceManager.adForId(call.<Integer>argument("adId"));
+        nativeAd4.createTemplateView(templateStyle3);
         result.success(null);
         break;
       case "loadInterstitialAd":

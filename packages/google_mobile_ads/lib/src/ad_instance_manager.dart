@@ -558,18 +558,18 @@ class AdInstanceManager {
   }
 
   /// [New] added by Bill
-  /// set factory id.
+  /// bind view buy factoryId.
   Future<void> setNativeAdFactoryId(NativeAd ad, String factoryId) async {
-    return channel.invokeMethod<void>('setNativeAdFactoryId', <dynamic, dynamic>{
+    return channel.invokeMethod<void>('bindNativeAdViewByFactoryId', <dynamic, dynamic>{
       'adId': adIdFor(ad),
       'factoryId': factoryId,
     });
   }
 
   /// [New] added by Bill
-  /// set template style
+  /// bind view buy templateStyle.
   Future<void> setNativeAdTemplateStyle(NativeAd ad, NativeTemplateStyle nativeTemplateStyle) async {
-    return channel.invokeMethod<void>('setNativeAdTemplateStyle', <dynamic, dynamic>{
+    return channel.invokeMethod<void>('bindNativeAdViewByTemplateStyle', <dynamic, dynamic>{
       'adId': adIdFor(ad),
       'nativeTemplateStyle': nativeTemplateStyle,
     });

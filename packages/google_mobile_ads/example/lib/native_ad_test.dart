@@ -119,14 +119,14 @@ class _NativeAdPageState extends State<NativeAdPage> {
               children: [
                 TextButton(
                     onPressed: () async {
-                      await _nativeAdA?.setFactoryId("adFactoryExample");
+                      await _nativeAdA?.bindViewByFactoryId("adFactoryExample");
                       _isAdALoaded = true;
                       setState(() {});
                     },
                     child: Text('Show Factory A')),
                 TextButton(
                     onPressed: () async {
-                      /*await _nativeAdB?.setTemplateStyle(NativeTemplateStyle(
+                      /*await _nativeAdB?.bindViewByTemplateStyle(NativeTemplateStyle(
                         templateType: TemplateType.small,
                         mainBackgroundColor: Colors.blue,
                         callToActionTextStyle: NativeTemplateTextStyle(
@@ -137,7 +137,7 @@ class _NativeAdPageState extends State<NativeAdPage> {
                           backgroundColor: Colors.white70,
                         ),
                       ));*/
-                      await _nativeAdB?.setFactoryId("adFactoryExampleB");
+                      await _nativeAdB?.bindViewByFactoryId("adFactoryExampleB");
                       _isAdBLoaded = true;
                       setState(() {});
                     },
