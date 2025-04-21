@@ -1078,15 +1078,15 @@ class NativeAd extends AdWithView {
   }
 
   /// [New] added by Bill
-  /// bind view buy factoryId.
+  /// bind view by factoryId.
   Future<void> bindViewByFactoryId(String factoryId) async {
-    return instanceManager.setNativeAdFactoryId(this, factoryId);
+    return instanceManager.bindNativeAdViewByFactoryId(this, factoryId);
   }
 
   /// [New] added by Bill
-  /// bind view buy templateStyle.
+  /// bind view by templateStyle.
   Future<void> bindViewByTemplateStyle(NativeTemplateStyle nativeTemplateStyle) async {
-    return instanceManager.setNativeAdTemplateStyle(this, nativeTemplateStyle);
+    return instanceManager.bindNativeAdViewByTemplateStyle(this, nativeTemplateStyle);
   }
 }
 
