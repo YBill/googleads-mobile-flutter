@@ -434,6 +434,82 @@
         nativeTemplateStyle:call.arguments[@"nativeTemplateStyle"]];
     [_manager loadAd:ad];
     result(nil);
+  } else if ([call.method isEqualToString:@"preLoadNativeAd"]) {
+    NSString *factoryId = call.arguments[@"factoryId"];
+    id<FLTNativeAdFactory> factory = _nativeAdFactories[factoryId];
+    FLTNativeTemplateStyle *templateStyle =
+        call.arguments[@"nativeTemplateStyle"];
+    
+    if ([FLTAdUtil isNotNull:factory] || [FLTAdUtil isNotNull:templateStyle]) {
+      NSLog(@"preLoadNativeAd called with a style, which will be ignored");
+    }
+    
+    FLTAdRequest *request;
+    if ([FLTAdUtil isNotNull:call.arguments[@"request"]]) {
+      request = call.arguments[@"request"];
+    } else if ([FLTAdUtil isNotNull:call.arguments[@"adManagerRequest"]]) {
+      request = call.arguments[@"adManagerRequest"];
+    }
+    
+    // 预加载时不传入nativeAdFactory和nativeTemplateStyle
+    FLTNativeAd *ad = [[FLTNativeAd alloc]
+           initWithAdUnitId:call.arguments[@"adUnitId"]
+                    request:request
+            nativeAdFactory:nil
+              customOptions:call.arguments[@"customOptions"]
+         rootViewController:rootController
+                       adId:call.arguments[@"adId"]
+            nativeAdOptions:call.arguments[@"nativeAdOptions"]
+        nativeTemplateStyle:nil];
+    [_manager loadAd:ad];
+    result(nil);
+  } else if ([call.method isEqualToString:@"bindNativeAdViewByFactoryId"]) {
+    NSNumber *adId = call.arguments[@"adId"];
+    NSString *factoryId = call.arguments[@"factoryId"];
+    id<FLTNativeAdFactory> factory = _nativeAdFactories[factoryId];
+    
+    if ([FLTAdUtil isNull:factory]) {
+      NSString *message =
+          [NSString stringWithFormat:@"Can't find NativeAdFactory with id: %@", factoryId];
+      result([FlutterError errorWithCode:@"NativeAdError"
+                                 message:message
+                                 details:nil]);
+      return;
+    }
+    
+    id<FLTAd> ad = [_manager adFor:adId];
+    if (![ad isKindOfClass:[FLTNativeAd class]]) {
+      result([FlutterError errorWithCode:@"NativeAdError"
+                                 message:@"Ad is not a NativeAd"
+                                 details:nil]);
+      return;
+    }
+    
+    FLTNativeAd *nativeAd = (FLTNativeAd *)ad;
+    [nativeAd bindNativeAdWithFactory:factory];
+    result(nil);
+  } else if ([call.method isEqualToString:@"bindNativeAdViewByTemplateStyle"]) {
+    NSNumber *adId = call.arguments[@"adId"];
+    FLTNativeTemplateStyle *nativeTemplateStyle = call.arguments[@"nativeTemplateStyle"];
+    
+    if ([FLTAdUtil isNull:nativeTemplateStyle]) {
+      result([FlutterError errorWithCode:@"NativeAdError"
+                                 message:@"NativeTemplateStyle is null"
+                                 details:nil]);
+      return;
+    }
+    
+    id<FLTAd> ad = [_manager adFor:adId];
+    if (![ad isKindOfClass:[FLTNativeAd class]]) {
+      result([FlutterError errorWithCode:@"NativeAdError"
+                                 message:@"Ad is not a NativeAd"
+                                 details:nil]);
+      return;
+    }
+    
+    FLTNativeAd *nativeAd = (FLTNativeAd *)ad;
+    [nativeAd bindNativeAdWithTemplateStyle:nativeTemplateStyle];
+    result(nil);
   } else if ([call.method isEqualToString:@"loadInterstitialAd"]) {
     FLTInterstitialAd *ad =
         [[FLTInterstitialAd alloc] initWithAdUnitId:call.arguments[@"adUnitId"]

@@ -1135,6 +1135,9 @@
 
 - (void)adLoader:(GADAdLoader *)adLoader
     didReceiveNativeAd:(GADNativeAd *)nativeAd {
+  // 保存加载的Native广告对象，用于后续绑定视图
+  self.loadedNativeAd = nativeAd;
+  
   // Use Nil instead of Null to fix crash with Swift integrations.
   NSDictionary<NSString *, id> *customOptions =
       [[NSNull null] isEqual:_customOptions] ? nil : _customOptions;
@@ -1191,6 +1194,40 @@
 #pragma mark - FlutterPlatformView
 - (UIView *)view {
   return _view;
+}
+
+- (void)bindNativeAdWithFactory:(NSObject<FLTNativeAdFactory> *)factory {
+  if (!factory) {
+    NSLog(@"Error: factory is nil in bindNativeAdWithFactory");
+    return;
+  }
+  
+  if (!self.loadedNativeAd) {
+    NSLog(@"Error: No native ad loaded in bindNativeAdWithFactory");
+    return;
+  }
+  
+  // 使用Nil代替Null修复与Swift集成时的崩溃
+  NSDictionary<NSString *, id> *customOptions =
+      [[NSNull null] isEqual:_customOptions] ? nil : _customOptions;
+  
+  // 创建原生广告视图
+  _view = [factory createNativeAd:self.loadedNativeAd customOptions:customOptions];
+}
+
+- (void)bindNativeAdWithTemplateStyle:(FLTNativeTemplateStyle *)templateStyle {
+  if (!templateStyle) {
+    NSLog(@"Error: templateStyle is nil in bindNativeAdWithTemplateStyle");
+    return;
+  }
+  
+  if (!self.loadedNativeAd) {
+    NSLog(@"Error: No native ad loaded in bindNativeAdWithTemplateStyle");
+    return;
+  }
+  
+  // 使用模板样式创建原生广告视图
+  _view = [templateStyle getDisplayedView:self.loadedNativeAd];
 }
 
 @synthesize manager;

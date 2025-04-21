@@ -288,6 +288,7 @@
 @interface FLTNativeAd
     : FLTBaseAd <FLTAd, FlutterPlatformView, GADNativeAdDelegate,
                  GADNativeAdLoaderDelegate>
+@property(nonatomic, strong, nullable) GADNativeAd *loadedNativeAd;
 - (instancetype _Nonnull)
        initWithAdUnitId:(NSString *_Nonnull)adUnitId
                 request:(FLTAdRequest *_Nonnull)request
@@ -298,6 +299,8 @@
         nativeAdOptions:(FLTNativeAdOptions *_Nullable)nativeAdOptions
     nativeTemplateStyle:(FLTNativeTemplateStyle *_Nullable)nativeTemplateStyle;
 - (GADAdLoader *_Nonnull)adLoader;
+- (void)bindNativeAdWithFactory:(NSObject<FLTNativeAdFactory> *_Nonnull)factory;
+- (void)bindNativeAdWithTemplateStyle:(FLTNativeTemplateStyle *_Nonnull)templateStyle;
 @end
 
 @interface FLTRewardItem : NSObject
