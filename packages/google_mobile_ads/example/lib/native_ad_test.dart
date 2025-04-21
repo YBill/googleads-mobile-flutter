@@ -49,10 +49,9 @@ class NativeAdPage extends StatefulWidget {
 }
 
 class _NativeAdPageState extends State<NativeAdPage> {
-  NativeAd? _nativeAdA;
-  NativeAd? _nativeAdB;
-  bool _isAdALoaded = false;
-  bool _isAdBLoaded = false;
+  NativeAd? _nativeAd;
+  bool _isAdBindByFactory = false;
+  bool _isAdBindByTemplateStyle = false;
 
   Future<void> _preloadAd(String adUnitId, Function(NativeAd?) onAdLoaded) async {
     _log('preloadAd, adUnitId: $adUnitId');
@@ -80,8 +79,7 @@ class _NativeAdPageState extends State<NativeAdPage> {
   @override
   void dispose() {
     super.dispose();
-    _nativeAdA?.dispose();
-    _nativeAdB?.dispose();
+    _nativeAd?.dispose();
   }
 
   @override
@@ -99,16 +97,16 @@ class _NativeAdPageState extends State<NativeAdPage> {
                 TextButton(
                     onPressed: () {
                       final adUnitId = Platform.isAndroid ? 'ca-app-pub-3940256099942544/2247696110' : 'ca-app-pub-3940256099942544/3986624511';
-                      if (_nativeAdA == null) {
-                        _preloadAd(adUnitId, (nativeAd) => _nativeAdA = nativeAd);
+                      if (_nativeAd == null) {
+                        _preloadAd(adUnitId, (nativeAd) => _nativeAd = nativeAd);
                       }
                     },
                     child: Text('Preload Ad A')),
                 TextButton(
                     onPressed: () {
                       final adUnitId = 'ca-app-pub-3940256099942544/9782828514';
-                      if (_nativeAdB == null) {
-                        _preloadAd(adUnitId, (nativeAd) => _nativeAdB = nativeAd);
+                      if (_nativeAd == null) {
+                        _preloadAd(adUnitId, (nativeAd) => _nativeAd = nativeAd);
                       }
                     },
                     child: Text('Preload Ad B')),
@@ -119,14 +117,14 @@ class _NativeAdPageState extends State<NativeAdPage> {
               children: [
                 TextButton(
                     onPressed: () async {
-                      await _nativeAdA?.bindViewByFactoryId("adFactoryExample");
-                      _isAdALoaded = true;
+                      await _nativeAd?.bindViewByFactoryId("adFactoryExample");
+                      _isAdBindByFactory = true;
                       setState(() {});
                     },
-                    child: Text('Show Factory A')),
+                    child: Text('Show Ad By Factory')),
                 TextButton(
                     onPressed: () async {
-                      /*await _nativeAdB?.bindViewByTemplateStyle(NativeTemplateStyle(
+                      await _nativeAd?.bindViewByTemplateStyle(NativeTemplateStyle(
                         templateType: TemplateType.small,
                         mainBackgroundColor: Colors.blue,
                         callToActionTextStyle: NativeTemplateTextStyle(
@@ -136,12 +134,11 @@ class _NativeAdPageState extends State<NativeAdPage> {
                           textColor: Colors.black38,
                           backgroundColor: Colors.white70,
                         ),
-                      ));*/
-                      await _nativeAdB?.bindViewByFactoryId("adFactoryExampleB");
-                      _isAdBLoaded = true;
+                      ));
+                      _isAdBindByTemplateStyle = true;
                       setState(() {});
                     },
-                    child: Text('Show Factory B')),
+                    child: Text('Show Ad By TemplateStyle')),
               ],
             ),
           ]),
@@ -151,8 +148,8 @@ class _NativeAdPageState extends State<NativeAdPage> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              _buildNativeAdWidget(_nativeAdA, _isAdALoaded),
-              _buildNativeAdWidget(_nativeAdB, _isAdBLoaded),
+              if (_isAdBindByFactory) _buildNativeAdWidget(_nativeAd, true),
+              if (_isAdBindByTemplateStyle) _buildNativeAdWidget(_nativeAd, true),
             ],
           ),
         ),
